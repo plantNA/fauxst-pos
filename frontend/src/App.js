@@ -35,6 +35,14 @@ function App() {
     setTotal(total - Number(itemToRemove.price));
 };
 
+const clearOrder = () => {
+  // Order array emptied
+  setOrder([]);
+  // Total reset to 0
+  setTotal(0);
+
+}
+
 
   return (
     <div className="App">
@@ -60,6 +68,8 @@ function App() {
           </li>
         ))}
       </ul>
+
+      <button onClick={clearOrder}>Clear Order</button>
       <p>Total: ${total.toFixed(2)}</p>
     </div>
   );
