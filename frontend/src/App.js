@@ -22,6 +22,20 @@ function App() {
     setTotal(total + Number(item.price));
   };
 
+  const removeFromOrder = (index) => {
+    const itemToRemove = order[index];
+
+  // 1. Create a new array without that item
+    const updatedOrder = order.filter((_, i) => i !== index);
+
+  // 2. Update state
+    setOrder(updatedOrder);
+
+  // 3. Update total
+    setTotal(total - Number(itemToRemove.price));
+};
+
+
   return (
     <div className="App">
       <h1>Toast POS System</h1>
@@ -42,7 +56,7 @@ function App() {
         {order.map((item, index) => (
           <li key={index}>
             {item.name} - ${Number(item.price).toFixed(2)}
-            {/* Optional challenge: add a "Remove" button here */}
+            <button onClick={() => removeFromOrder(index)}>Remove</button>
           </li>
         ))}
       </ul>
