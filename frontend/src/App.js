@@ -81,7 +81,27 @@ useEffect(() => {
   setGrandTotal(totals.grandTotal);
 }, [order]); // <- dependency array ensures this runs whenever order changes
 
+function completePayment() {
+  // if no paymentMethod selected, do nothing
+  if (paymentMethod === null) {
+    return;
+  }
+  // set paymentComplete to true
+  setPaymentComplete(true);
 
+  // clear the order
+  setOrder([]);
+  setSubtotal(0);
+  setTaxAmount(0);
+  setGrandTotal(0);
+  setTotal(0);
+
+  // reset paymentMethod to null
+  setPaymentComplete(null);
+
+  // close checkout panel
+  setIsCheckingOut(false);
+}
 
 
   return (
@@ -128,6 +148,8 @@ useEffect(() => {
         <button onClick={() => setPaymentMethod("cash")}>Cash</button>
         <button onClick={() => setPaymentMethod("card")}>Card</button>
         <button onClick={() => setIsCheckingOut(false)}>Cancel</button>
+
+        <button onClick={completePayment}>Complete Payment</button>
   </div>
 )}
 
