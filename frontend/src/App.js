@@ -12,6 +12,8 @@ function App() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null); // Cash or card
   const [paymentComplete, setPaymentComplete] = useState(false);
+  const [paymentMessage, setPaymentMessage] = useState("");
+
 
   // Fetch menu from backend
   useEffect(() => {
@@ -21,141 +23,197 @@ function App() {
       .catch(error => console.error('Error fetching menu:', error));
   }, []);
 
-  // Add item to order
   const addToOrder = (item) => {
-    // ✅ Your task: add the item to the `order` array
-    setOrder([...order, item]);
-    // ✅ Your task: update the total price
-    setTotal(total + Number(item.price));
+    const existingItem = order.find(orderItem => orderItem.id === item.id);
+
+    if (existingItem) {
+      const updatedOrder = order.map(orderItem =>
+        orderItem.id === item.id
+          ? { ...orderItem, quantity: orderItem.quantity + 1 }
+          : orderItem
+      );
+      setOrder(updatedOrder);
+    } else {
+      setOrder([...order, { ...item, quantity: 1 }]);
+    }
   };
 
   const removeFromOrder = (index) => {
-    const itemToRemove = order[index];
+    const updatedOrder = [...order];
+    const itemToRemove = updatedOrder[index];
 
-  // 1. Create a new array without that item
-    const updatedOrder = order.filter((_, i) => i !== index);
+    if (itemToRemove.quantity > 1) {
+      updatedOrder[index] = { ...itemToRemove, quantity: itemToRemove.quantity - 1 };
+      setOrder(updatedOrder);
+    } else {
+      setOrder(updatedOrder.filter((_, i) => i !== index));
+    }
+  };
 
-  // 2. Update state
-    setOrder(updatedOrder);
+  const clearOrder = () => {
+    setOrder([]);
+    setTotal(0);
+    setSubtotal(0);
+    setTaxAmount(0);
+    setGrandTotal(0);
+  };
 
-  // 3. Update total
-    setTotal(total - Number(itemToRemove.price));
-};
+  const startCheckout = () => {
+    setIsCheckingOut(true);
+  };
 
-const clearOrder = () => {
-  // Order array emptied
-  setOrder([]);
-  // Total reset to 0
-  setTotal(0);
+  const calculateTotals = (orderItems) => {
+    const subtotal = orderItems.reduce(
+      (acc, item) => acc + Number(item.price) * (item.quantity || 1),
+      0
+    );
+    const taxAmount = subtotal * taxRate;
+    const grandTotal = subtotal + taxAmount;
+    return { subtotal, taxAmount, grandTotal };
+  };
 
-}
+  useEffect(() => {
+    const totals = calculateTotals(order);
+    setSubtotal(totals.subtotal);
+    setTaxAmount(totals.taxAmount);
+    setGrandTotal(totals.grandTotal);
+  }, [order]);
 
-const startCheckout = () => {
-  setIsCheckingOut(true);
-};
-
-
-function calculateTotals(orderItems) {
-  // your job: compute subtotal
-  const subtotal = orderItems.reduce((accumulator,item) => {
-    return accumulator + Number(item.price);
-  }, 0);
-  // your job: compute taxAmount using taxRate
-  const taxAmount = subtotal * taxRate;
-  // your job: compute grandTotal
-  const grandTotal = subtotal + taxAmount;
-  // return an object with all 3 values
-  return { subtotal, taxAmount, grandTotal };
-}
-
-useEffect(() => {
-  // 1. Call your calculateTotals function with the current order
-  const totals = calculateTotals(order);
-
-  // 2. Update the three state variables
-  // setSubtotal(...)
-  setSubtotal(totals.subtotal);
-  // setTaxAmount(...)
-  setTaxAmount(totals.taxAmount);
-  // setGrandTotal(...)
-  setGrandTotal(totals.grandTotal);
-}, [order]); // <- dependency array ensures this runs whenever order changes
-
-function completePayment() {
-  // if no paymentMethod selected, do nothing
-  if (paymentMethod === null) {
+  function completePayment() {
+  // 1. If no paymentMethod is selected, stop the function
+  if(paymentMethod === null)
     return;
+
+  // 2. Create an "orderData" object
+  //    It should include:
+  //    - items (the order array)
+  //    - subtotal
+  //    - taxAmount
+  //    - grandTotal
+  //    - paymentMethod
+  //    - timestamp (use new Date().toISOString())
+  const orderData = {
+    items: order,
+    subtotal:subtotal,
+    taxAmount:taxAmount,
+    grandTotal:grandTotal,
+    paymentMethod: paymentMethod,
+    timestamp:new Date().toISOString()
   }
-  // set paymentComplete to true
-  setPaymentComplete(true);
 
-  // clear the order
-  setOrder([]);
-  setSubtotal(0);
-  setTaxAmount(0);
-  setGrandTotal(0);
-  setTotal(0);
+  // 3. Send the orderData to backend using fetch()
+  //    URL: http://localhost:5000/api/orders
+  //    Method: POST
+  //    Headers: JSON
+  //    Body: orderData
+  fetch("http://localhost:5000/api/orders", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(orderData)
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Server responded with:", data);
+      // 5. Reset the current order and totals
+      //    - setOrder([])
+      //    - setSubtotal(0)
+      //    - setTaxAmount(0)
+      //    - setGrandTotal(0)
+      //    - setTotal(0)
+      setOrder([]);
+      setSubtotal(0);
+      setTaxAmount(0);
+      setGrandTotal(0);
+      setTotal(0);
+      setPaymentMessage("Payment Successful! Thank you for your order.");
+    })
+    .catch(error => {
+      console.error('Error placing order:', error);
+      throw error; // Re-throw the error for further handling
+    });
+   
 
-  // reset paymentMethod to null
-  setPaymentComplete(null);
+  // 4. After sending (inside .then()):
+  //    - log the response (console.log)
 
-  // close checkout panel
+
+  // 6. Reset paymentMethod to null
+  setPaymentMethod(null);
+
+  // 7. Close checkout panel
   setIsCheckingOut(false);
-}
+  }
 
+return (
+  <div className="App">
+    <h1>Toast POS System</h1>
+    <p>Manage orders and menu items here.</p>
 
-  return (
-    <div className="App">
-      <h1>Toast POS System</h1>
-      <p>Manage orders and menu items here.</p>
+    <h2>Menu</h2>
+    <ul>
+      {menu.map(item => (
+        <li key={item.id}>
+          {item.name} - ${Number(item.price).toFixed(2)}
+          <button 
+            onClick={() => addToOrder(item)} 
+            disabled={isCheckingOut}
+          >
+            Add to Order
+          </button>
+        </li>
+      ))}
+    </ul>
 
-      <h2>Menu</h2>
-      <ul>
-        {menu.map(item => (
-          <li key={item.id}>
-            {item.name} - ${Number(item.price).toFixed(2)}
-            <button onClick={() => addToOrder(item)}>Add to Order</button>
-          </li>
-        ))}
-      </ul>
+    <h2>Current Order</h2>
+    <ul>
+      {order.map((item, index) => (
+        <li key={index}>
+          {item.name} - ${Number(item.price).toFixed(2)} x {item.quantity}
+          <button 
+            onClick={() => removeFromOrder(index)} 
+            disabled={isCheckingOut}
+          >
+            Remove
+          </button>
+        </li>
+      ))}
+    </ul>
 
-      <h2>Current Order</h2>
-      <ul>
-        {order.map((item, index) => (
-          <li key={index}>
-            {item.name} - ${Number(item.price).toFixed(2)}
-            <button onClick={() => removeFromOrder(index)}>Remove</button>
-          </li>
-        ))}
-      </ul>
+    <button onClick={clearOrder} disabled={isCheckingOut}>
+      Clear Order
+    </button>
 
-      <button onClick={clearOrder}>Clear Order</button>
-      <p>Total: ${total.toFixed(2)}</p>
+    <div className="summary-panel">
+      <h2>Order Summary</h2>
+      <p>Subtotal: ${subtotal.toFixed(2)}</p>
+      <p>Tax: ${taxAmount.toFixed(2)}</p>
+      <p>Total: ${grandTotal.toFixed(2)}</p>
+    </div>
 
-      <div className="summary-panel">
-        <h2>Order Summary</h2>
-        <p>Subtotal: ${subtotal.toFixed(2)}</p>
-        <p>Tax: ${taxAmount.toFixed(2)}</p>
-        <p>Total: ${grandTotal.toFixed(2)}</p>
-      </div>
+    <button 
+      onClick={startCheckout} 
+      disabled={order.length === 0 || isCheckingOut}
+    >
+      Checkout
+    </button>
 
-      <button onClick={startCheckout}>Checkout</button>
-      {isCheckingOut && (
-        <div className="payment-panel">
+    {/* Payment success message */}
+    {paymentMessage && <p className="payment-success">{paymentMessage}</p>}
+
+    {isCheckingOut && (
+      <div className="payment-panel">
         <h2>Payment</h2>
         <p>Total: ${grandTotal.toFixed(2)}</p>
-
         <button onClick={() => setPaymentMethod("cash")}>Cash</button>
         <button onClick={() => setPaymentMethod("card")}>Card</button>
         <button onClick={() => setIsCheckingOut(false)}>Cancel</button>
-
         <button onClick={completePayment}>Complete Payment</button>
+      </div>
+    )}
   </div>
-)}
-
-    </div>
-    
-  );
-}
+);
+};
 
 export default App;
