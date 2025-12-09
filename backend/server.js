@@ -49,7 +49,6 @@ app.get('/api/menu', (req, res) => {
 app.post('/api/orders', (req, res) => {
   const { items, subtotal, taxAmount, grandTotal, paymentMethod } = req.body;
 
-  // Validate required fields (timestamp is auto-generated)
   if (!items || !subtotal || !taxAmount || !grandTotal || !paymentMethod) {
     console.log("Missing fields:", req.body);
     return res.status(400).json({ error: "Missing required order fields" });
@@ -75,6 +74,42 @@ app.post('/api/orders', (req, res) => {
       res.json({ success: true, id: results.insertId });
     }
   );
+});
+
+// -------------------------
+// GET /api/orders
+// -------------------------
+app.get('/api/orders', (req, res) => {
+  const query = `SELECT * FROM orders ORDER BY timestamp DESC LIMIT 100`;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching orders:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    const formattedResults = results.map(order => {
+      let itemsParsed = [];
+
+      try {
+        // Some MySQL clients return Buffer, so convert if needed
+        const rawItems = order.items instanceof Buffer
+          ? order.items.toString()
+          : order.items;
+
+        itemsParsed = JSON.parse(rawItems);
+      } catch (e) {
+        console.error("JSON parse error for order:", order.id, e);
+      }
+
+      return {
+        ...order,
+        items: itemsParsed
+      };
+    });
+
+    res.json(formattedResults);
+  });
 });
 
 // -------------------------
