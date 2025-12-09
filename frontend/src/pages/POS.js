@@ -72,7 +72,8 @@ export default function POS({ menu, order, setOrder, subtotal, taxAmount, grandT
   };
 
   return (
-    <div className="pos-page">
+<div className="pos-container">
+    <div className="pos-menu-panel">
       <h2>Menu</h2>
       <ul>
         {menu.map(item => (
@@ -82,7 +83,8 @@ export default function POS({ menu, order, setOrder, subtotal, taxAmount, grandT
           </li>
         ))}
       </ul>
-
+</div>
+    <div className="pos-order-panel">
       <h2>Current Order</h2>
       <ul>
         {order.map((item, i) => (
@@ -124,6 +126,7 @@ export default function POS({ menu, order, setOrder, subtotal, taxAmount, grandT
       )}
 
       {paymentMessage && <p className="success">{paymentMessage}</p>}
+    </div>
     </div>
   );
 }

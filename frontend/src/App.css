@@ -1,3 +1,7 @@
+/* =====================
+   Global / Existing Styles
+===================== */
+
 .App {
   text-align: center;
 }
@@ -14,7 +18,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #282c34; /* maybe change later */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -34,5 +38,255 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* =====================
+   POS Page Styles
+===================== */
+
+/* Main container: menu + order panels */
+.pos-container {
+  display: flex;            
+  gap: 20px;                
+  padding: 20px;
+  background-color: #f0f0f0;
+  flex-direction: row;
+  /* TODO: add responsive stacking and background color */
+}
+
+/* ---------------------
+   Menu Panel
+--------------------- */
+.pos-menu-panel {
+  flex: 1;                  
+  background-color: #fff;   
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s ease-in-out;
+  /* TODO: add shadow, hover effect for panel */
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  justify-items: center;
+
+  /* TODO: set grid item spacing, responsive adjustments */
+}
+
+.menu-item-card {
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #A9A9A9;
+  color: #b1b1b1;
+  transition: background-color 0.3s ease;
+  /* TODO: add background color, hover effect, border */
+}
+
+.menu-item-name {
+  font-weight: bold;
+  font-size: 8px;
+  color: #2c2d2d;
+  /* TODO: font size, color */
+}
+
+.menu-item-price {
+  font-size: 8px;
+  color: #2c2d2d;
+  font-style: italic;
+  /* TODO: font size, color, maybe italics */
+}
+
+.add-btn {
+  background-color: #A9A9A9;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  /* TODO: button background color, padding, hover effect, cursor style */
+}
+
+/* ---------------------
+   Order Panel
+--------------------- */
+.pos-order-panel {
+  flex: 1;                  
+  background-color: #fff;   
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s ease-in-out;
+  gap: 20px;
+  /* TODO: add shadow, panel spacing */
+}
+
+.order-items-list {
+  max-height: 300px;       
+  overflow-y: auto;
+  margin-bottom: 10px;
+  border: #282c34;
+
+  /* TODO: maybe add border, scroll bar style */
+}
+
+.order-items-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.order-items-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.order-items-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.order-items-list::-webkit-scrollbar-hover {
+  background: #555;
+}
+
+
+.order-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 2px;
+  /* TODO: add border-bottom or spacing */
+}
+
+.order-item-name {
+  font-weight: bold;
+  color: #888;
+  font-size: 8px;
+  /* TODO: color, font-size */
+}
+
+.order-item-price {
+  color: #888;
+  font-size: 8px;
+  /* TODO: color, font-size */
+}
+
+.remove-btn {
+  padding: 5px 10px;
+  font-size: 6px;
+
+  background-color:#2c2d2d;
+  color: red;
+  cursor: pointer;
+  /* TODO: small button styling, color, hover effect */
+}
+
+.remove-btn:hover {
+  background-color: #2c2d2c;
+  color: red;
+}
+
+.order-totals {
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+  margin-top: 10px;
+  font-style: bold;
+  /* TODO: maybe bold totals or highlight */
+}
+
+.subtotal,
+.tax,
+.total {
+  background-color: #2c2d2c;
+  padding: 20px;
+  border: 1px solid #2c2d2d;
+  cursor: pointer;
+  /* TODO: differentiate styling for each */
+}
+
+.subtotal {
+  color: #2c2c2c;
+  margin-right: 5px;
+}
+
+.tax {
+  color: #2c2c2c;
+  margin-right: 5px;
+}
+
+.total {
+  color: #2c2c2c;
+  margin-right: 5px;
+}
+
+.checkout-btn {
+  margin-top: 15px;
+  color: #A9A9A9;
+  padding: 10px;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  /* TODO: prominent button styling, color, hover */
+}
+
+/* ---------------------
+   Payment Panel
+--------------------- */
+.payment-panel {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #A9A9A9;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  /* TODO: background color, shadow, spacing */
+}
+
+.payment-btn {
+  margin-right: 10px;
+  /* TODO: highlight selected payment method */
+}
+
+.payment-btn::selection {
+  background-color: #A9A9A9;
+  color: #2c2c2c;
+}
+
+.complete-payment-btn {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  color: black;
+  padding: 10px;
+  /* TODO: prominent button styling */
+}
+
+.cancel-btn {
+  margin-top: 10px;
+  padding: 5px;
+  border-radius: 8px;
+  color: black;
+  padding: 10px;
+  /* TODO: secondary button styling */
+}
+
+.success-message {
+  margin-top: 10px;
+  color: green;
+  font-style: bold;
+  transition: color 0.3s ease, transform 0.3s ease;
+  /* TODO: green text, bold, maybe animation */
+}
+
+/* =====================
+   Responsive
+===================== */
+@media (max-width: 768px) {
+  .pos-container {
+    flex-direction: column; /* stack panels vertically */
+    /* TODO: adjust spacing, padding for mobile */
   }
 }
